@@ -7,23 +7,23 @@ namespace API.Services
     public class IPAddressLookupService
     {
         private readonly IPGeolocationAPI _iPGeolocationAPI;
-        private readonly ApiResponsesRepository _apiResponsesRepository;
+        private readonly ApiFullResponsesRepository _apiFullResponsesRepository;
 
         public IPAddressLookupService(
             IPGeolocationAPI iPGeolocationAPI,
-            ApiResponsesRepository apiResponsesRepository
+            ApiFullResponsesRepository apiFullResponsesRepository
             )
         {
             _iPGeolocationAPI = iPGeolocationAPI;
-            _apiResponsesRepository = apiResponsesRepository;
+            _apiFullResponsesRepository = apiFullResponsesRepository;
         }
 
-        public ApiResponseModel FetchAPIWithIpAddress(ApiRequestModel request)
+        public ApiResponseFullModel FetchAPIWithIpAddress(ApiRequestModel request)
         {
             try
             {
                 Dictionary<string, object> geoLocation = new Dictionary<string, object>();
-                ApiResponseModel responseModel = new()
+                ApiResponseFullModel responseModel = new()
                 {
                     ApiRequestId = request.Id,
                     ApiRequest = request,

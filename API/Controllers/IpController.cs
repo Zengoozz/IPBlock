@@ -11,14 +11,14 @@ namespace API.Controllers
     public class IpController : ControllerBase
     {
         private readonly IPAddressLookupService _iPAddressLookupService;
-        private readonly ApiResponsesRepository _apiResponsesRepository; //FOR TEST
+        private readonly ApiFullResponsesRepository _apiFullResponsesRepository; //FOR TEST
         public IpController(
             IPAddressLookupService iPAddressLookupService,
-            ApiResponsesRepository apiResponsesRepository //FOR TEST
+            ApiFullResponsesRepository apiFullResponsesRepository //FOR TEST
             )
         {
             _iPAddressLookupService = iPAddressLookupService;
-            _apiResponsesRepository = apiResponsesRepository; //FOR TEST
+            _apiFullResponsesRepository = apiFullResponsesRepository; //FOR TEST
         }
         #region EndPoints
         [HttpPost("lookup")]
@@ -38,7 +38,7 @@ namespace API.Controllers
 
             request.IpAddress = ipAddress;
 
-            ApiResponseModel response = _iPAddressLookupService.FetchAPIWithIpAddress(request);
+            ApiResponseFullModel response = _iPAddressLookupService.FetchAPIWithIpAddress(request);
 
             if(response.StatusCode == "200")
             {
@@ -53,7 +53,7 @@ namespace API.Controllers
         [HttpGet("testGet")]
         public IActionResult GetAllGeoLocationResponsesSavedForTest() //FOR TEST
         {
-            List<ApiResponseModel> response = _apiResponsesRepository.GetAll();
+            List<ApiResponseFullModel> response = _apiFullResponsesRepository.GetAll();
 
             return Ok(response);
         }

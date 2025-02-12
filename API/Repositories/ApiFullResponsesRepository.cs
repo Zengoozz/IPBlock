@@ -2,11 +2,11 @@
 
 namespace API.Repositories
 {
-    public class ApiResponsesRepository
+    public class ApiFullResponsesRepository
     {
-        private readonly List<ApiResponseModel> _dataModels = new();
+        private readonly List<ApiResponseFullModel> _dataModels = new();
 
-        public void Add(ApiResponseModel response)
+        public void Add(ApiResponseFullModel response)
         {
             try
             {
@@ -17,7 +17,7 @@ namespace API.Repositories
                 throw;
             }
         }
-        public List<ApiResponseModel> GetAll()
+        public List<ApiResponseFullModel> GetAll()
         {
             return _dataModels;
         }

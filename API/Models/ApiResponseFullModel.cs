@@ -2,7 +2,7 @@
 
 namespace API.Models
 {
-    public class ApiResponseModel
+    public class ApiResponseFullModel
     {
         public Guid Id { get; } = Guid.NewGuid();
         public bool IsSuccess { get; set; } = false;
