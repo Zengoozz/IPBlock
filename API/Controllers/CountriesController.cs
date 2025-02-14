@@ -1,4 +1,5 @@
-﻿using API.Repositories;
+﻿using API.Models;
+using API.Repositories;
 using API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,20 +54,23 @@ namespace API.Controllers
         }
 
         [HttpPost("Check-Block")]
-        public IActionResult CheckIpCountryBlocked(string? iPAddress = null)
+        public IActionResult CheckIpCountryBlocked(string iPAddress = "")
         {
-            var apiResponse = _iPAddressLookupService.FetchAPIWithIpAddress(iPAddress);
+            ApiRequestModel request = new();
+            request.IpAddress = iPAddress;
+
+            var apiResponse = _iPAddressLookupService.FetchAPIWithIpAddress(request);
 
             if (apiResponse.StatusCode == "200")
             {
                 var blockedCountriesCodes = _blockedCountriesRepository.GetAllCountryCodesBlocked();
 
-                var isBlocked = blockedCountriesCodes.FirstOrDefault(i => apiResponse.ApiDataModel != null && apiResponse.ApiDataModel.CountryCode2 == i);
+                var isBlocked = blockedCountriesCodes.FirstOrDefault(i => apiResponse.ApiResponseData != null && apiResponse.ApiResponseData.CountryCode2 == i);
 
                 if (isBlocked == null)
-                    return Ok(apiResponse.ApiDataModel?.IPAddress ?? "" + " is not blocked");
+                    return Ok(apiResponse.ApiResponseData?.IPAddress ?? "" + " is not blocked");
 
-                return Ok(apiResponse.ApiDataModel?.IPAddress ?? "" + " is blocked");
+                return Ok(apiResponse.ApiResponseData?.IPAddress ?? "" + " is blocked");
             }
             else
             {
@@ -75,37 +79,43 @@ namespace API.Controllers
 
         }
         [HttpPost("BlockCurrentIPCountry")]
-        public IActionResult BlockCurrentIPCountry(string? iPAddress = null)
+        public IActionResult BlockCurrentIPCountry(string iPAddress = "")
         {
-            var apiResponse = _iPAddressLookupService.FetchAPIWithIpAddress(iPAddress);
+            ApiRequestModel request = new();
+            request.IpAddress = iPAddress;
 
-            if (apiResponse.StatusCode != "200" || apiResponse.ApiDataModel?.CountryCode2 == "")
+            var apiResponse = _iPAddressLookupService.FetchAPIWithIpAddress(request);
+
+            if (apiResponse.StatusCode != "200" || apiResponse.ApiResponseData?.CountryCode2 == "")
                 return StatusCode(500);
 
-            var isSuccessResponse = _blockedCountriesRepository.Block(apiResponse.ApiDataModel?.CountryCode2 ?? "", apiResponse.ApiDataModel?.CountryName ?? "");
+            var isSuccessResponse = _blockedCountriesRepository.Block(apiResponse.ApiResponseData?.CountryCode2 ?? "", apiResponse.ApiResponseData?.CountryName ?? "");
 
             if (isSuccessResponse == 1)
-                return Ok(apiResponse.ApiDataModel?.CountryCode2 + " country blocked successfully");
+                return Ok(apiResponse.ApiResponseData?.CountryCode2 + " country blocked successfully");
             else if (isSuccessResponse == 2)
                 return Conflict("Error: Temporal Duration Conflict");
             else if (isSuccessResponse == 3)
-                return BadRequest(apiResponse.ApiDataModel?.CountryCode2 + " country is already blocekd");
+                return BadRequest(apiResponse.ApiResponseData?.CountryCode2 + " country is already blocekd");
             else
                 return StatusCode(500, "Error in blocking");
         }
 
         [HttpPost("UnBlockCurrentIPCountry")]
-        public IActionResult UnBlockCurrentIPCountry(string? iPAddress = null)
+        public IActionResult UnBlockCurrentIPCountry(string iPAddress = "")
         {
-            var apiResponse = _iPAddressLookupService.FetchAPIWithIpAddress(iPAddress);
+            ApiRequestModel request = new();
+            request.IpAddress = iPAddress;
 
-            if (apiResponse.StatusCode != "200" || apiResponse.ApiDataModel?.CountryCode2 == "")
+            var apiResponse = _iPAddressLookupService.FetchAPIWithIpAddress(request);
+
+            if (apiResponse.StatusCode != "200" || apiResponse.ApiResponseData?.CountryCode2 == "")
                 return StatusCode(500);
 
-            bool isSuccessResponse = _blockedCountriesRepository.UnBlock(apiResponse.ApiDataModel?.CountryCode2 ?? "");
+            bool isSuccessResponse = _blockedCountriesRepository.UnBlock(apiResponse.ApiResponseData?.CountryCode2 ?? "");
 
             if (isSuccessResponse)
-                return Ok(apiResponse.ApiDataModel?.CountryCode2 ?? "" + " country unblocked successfully");
+                return Ok(apiResponse.ApiResponseData?.CountryCode2 ?? "" + " country unblocked successfully");
             else
                 return NotFound("Country is already unblocked");
         }
